@@ -16,3 +16,8 @@ Install [ROS2 Jazzy](docs/ros2_installation.md).
 ### UFactory-850 Driver 
 
 Install [UFactory-850 ROS2 Driver](docs/ufactory850_installation.md).
+
+### Gazebo
+
+Test UFactory-850 robot in Gazebo after installing UFactory-850 driver. Use these [instructions](docs/gazebo_usage.md).
+
