@@ -5,6 +5,10 @@ Final Project for ROB545 - Visual Servoing
 
 Our [proposal](docs/ROB545-Final-Project-Proposal-2026.10.12.pdf) was submitted on 10/12/2026. We are implementing visual servoing of a simulated object with a simulated UFactory-850 robot using ROS2 and Gazebo.
 
+## Journal
+
+Here is a [journal](docs/journal.md) of our progress and issues to be resolved.
+
 ## Installation
 
 This is our installation procedure so far. 
