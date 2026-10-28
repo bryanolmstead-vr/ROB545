@@ -21,3 +21,33 @@ One thing to handle properly is rotation. **ruckig** is a cartesian trajectory p
 ChatGPT recommends we look at what's provided with the UF850 Gazebo simulator as input. Is it just joint angles are is more of the UF850 controller implemented somehow? Maybe **mode 7** is already implemented.
 
 I am reading the **ruckig** repo docs and the paper to understand how all of it works.
+10/27/2026
+ Nabin
+
+Gazebo block creation and predefined trajectory
+
+I successfully created and spawned a block in the UF850 Gazebo simulation using ROS 2 Jazzy and Gazebo Harmonic. The block was defined using an SDF model and spawned into the existing /world/default environment containing the UF850 robot and table.
+
+I verified that the block could be moved by calling Gazebo's /world/default/set_pose service. The service returned data: true, and the block visibly changed position.
+
+I then developed a Python script (move_block.py) to move the block automatically along a predefined sinusoidal trajectory on the X-axis. The block moves back and forth between approximately 0.5 m and 0.6 m, with a nominal trajectory period of 8 seconds.
+
+Results:
+
+Block creation and spawning were successful.
+
+Manual position control through the Gazebo service worked.
+
+The Python script successfully produced continuous back-and-forth movement.
+
+Gazebo remained responsive during the test.
+
+The movement was moderately smooth, with some visible discontinuities.
+
+Current limitations and next steps:
+
+The Python script currently uses repeated gz service calls through subprocesses to update the block's position. This introduces overhead and may contribute to uneven movement.
+
+I confirmed that the ROS 2 ros_gz_interfaces/srv/SetEntityPose interface is installed. The next step is to test communication through ros_gz_bridge and implement a ROS 2 Python node for more efficient trajectory updates.
+
+This work addresses the initial moving-object simulation problem. Camera integration, PBVS, and UF850 tracking control have not yet been implemented.
