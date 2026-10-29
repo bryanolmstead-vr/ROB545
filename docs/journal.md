@@ -21,10 +21,12 @@ One thing to handle properly is rotation. **ruckig** is a cartesian trajectory p
 ChatGPT recommends we look at what's provided with the UF850 Gazebo simulator as input. Is it just joint angles are is more of the UF850 controller implemented somehow? Maybe **mode 7** is already implemented.
 
 I am reading the **ruckig** repo docs and the paper to understand how all of it works.
-10/27/2026
- Nabin
 
-Gazebo block creation and predefined trajectory
+--
+
+###10/27/2026 Nabin
+
+**Gazebo block creation and predefined trajectory**
 
 I successfully created and spawned a block in the UF850 Gazebo simulation using ROS 2 Jazzy and Gazebo Harmonic. The block was defined using an SDF model and spawned into the existing /world/default environment containing the UF850 robot and table.
 
