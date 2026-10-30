@@ -21,3 +21,12 @@ One thing to handle properly is rotation. **ruckig** is a cartesian trajectory p
 ChatGPT recommends we look at what's provided with the UF850 Gazebo simulator as input. Is it just joint angles are is more of the UF850 controller implemented somehow? Maybe **mode 7** is already implemented.
 
 I am reading the **ruckig** repo docs and the paper to understand how all of it works.
+
+**10/30/2026**
+
+Figured out that there is a motion controller for the UF850 gazebo sim, it was just turned off. I needed to fix the launch script a little in order to allow a parameter to be passed through, but then it worked and I can specify a goal position and the robot moves there. 
+
+**TODO**
+
+- Figure out whether `mode 7` is supported.
+- Incorporate whatever custom files are needed in this repo.
