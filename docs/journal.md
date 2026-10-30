@@ -30,3 +30,7 @@ Figured out that there is a motion controller for the UF850 gazebo sim, it was j
 
 - Figure out whether `mode 7` is supported.
 - Incorporate whatever custom files are needed in this repo.
+
+**10/30/2026**
+
+`mode 7` is not supported. The simulator provides a joint trajectory controller. I think we need to implement our own cartesian online trajectory controller using **ruckig** and inverse kinematics to get to joint space. We need to handle orientation properly. Still working with ChatGPT to understand what needs to be done. The controller I enabled to move the robot may be too elaborate for raw servoing commands. There may be another path that makes sense.
