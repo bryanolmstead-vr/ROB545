@@ -119,3 +119,31 @@ In reading Corke *Visual Control of Robots* section 6.4 *Visual Feedback Control
 Section 7.1 formulates the control equations for visual servoing. Position error is treated as a velocity and is integrated to yield position. For a still object (step function movement), tracking error becomes zero. For a constant speed object (ramp movement), there is a steady tracking error (lag). The end of section 7.1 describes feedforward as a viable solution to this problem.
 
 Section 7.5 discusses feedforward control, which is what we desire for our project, shown in Figure 7.20 or perhaps instead Figure 7.21.
+
+**Establishing Velocity Control Mode**
+
+On the real robot, I tested whether the robot could move in velocity mode (mode 5). 
+
+```
+ros2 service call /ufactory/set_mode xarm_msgs/srv/SetInt16 "{data: 5}"
+ros2 service call /ufactory/set_state xarm_msgs/srv/SetInt16 "{data: 0}"
+ros2 topic echo /ufactory/robot_states --once
+```
+This confirms it went into mode 5 (velocity mode). State = 1, which normally means motion. Perhaps in velocity mode it means it's actively controlling the robot "moving" but at velocity = 0.
+
+Here is the first velocity test:
+```
+ros2 service call /ufactory/vc_set_cartesian_velocity xarm_msgs/srv/MoveVelocity \
+"{speeds: [0, 0, 5, 0, 0, 0], is_tool_coord: false, duration: 0.5}"
+```
+It moved slowly upward as expected. now for something a little faster:
+```
+ros2 service call /ufactory/vc_set_cartesian_velocity xarm_msgs/srv/MoveVelocity \
+"{speeds: [0, 0, 10, 0, 0, 0], is_tool_coord: false, duration: 2.0}"
+```
+That worked. Then I put it back into mode 0 (normal moves):
+```
+ros2 service call /ufactory/set_mode xarm_msgs/srv/SetInt16 "{data: 0}"
+ros2 service call /ufactory/set_state xarm_msgs/srv/SetInt16 "{data: 0}"
+```
+This confirms that the ROS driver on the real robot can implement mode 5 (velocity control). Next step is to see if that can be done in the simulation.
