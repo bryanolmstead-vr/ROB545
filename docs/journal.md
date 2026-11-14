@@ -147,3 +147,73 @@ ros2 service call /ufactory/set_mode xarm_msgs/srv/SetInt16 "{data: 0}"
 ros2 service call /ufactory/set_state xarm_msgs/srv/SetInt16 "{data: 0}"
 ```
 This confirms that the ROS driver on the real robot can implement mode 5 (velocity control). Next step is to see if that can be done in the simulation.
+
+**Gazebo simulation with velocity control**
+
+It seems that the Gazebo sim with moveit_servo might be the closest thing in the UFactory repo to what we need. It is designed to use a keyboard to jog the simulated robot around.
+
+Built the xarm_moveit_servo with colcon. Started things like this:
+```
+ros2 launch xarm_moveit_config uf850_moveit_gazebo.launch.py
+ros2 launch xarm_moveit_servo uf850_moveit_servo_gazebo.launch.py
+ros2 service call /servo_server/switch_command_type moveit_msgs/srv/ServoCommandType "{command_type: 1}"
+```
+
+Worked a long time with ChatGPT but never got this to work. Here is what we are trying to accomplish:
+
+### UF850 Gazebo: MoveIt Servo Cartesian Velocity Control
+
+**Objective**
+
+Get `xarm_moveit_servo` working with the UF850 Gazebo simulation so that we can send Cartesian velocity (`TwistStamped`) commands and move the simulated robot in Cartesian space.
+
+This is intended to provide a simulation equivalent to the Cartesian velocity control we previously tested on the real UF850 using UFactory Mode 5.
+
+### Real Robot vs. Simulation
+
+On the real robot, Mode 5 accepts a six-element Cartesian velocity command:
+
+`[vx, vy, vz, wx, wy, wz]`
+
+Linear velocities are in mm/s and angular velocities in rad/s. The UFactory controller handles the inverse kinematics and joint motion internally.
+
+In simulation, MoveIt Servo provides the corresponding functionality. It accepts Cartesian Twist commands, calculates joint commands using the robot model, and sends them to the Gazebo trajectory controller. Servo also provides smoothing, joint-limit handling, singularity handling, and collision checking.
+
+### Work Completed
+
+1. Established a working UF850 Gazebo and MoveIt environment using `uf850_beside_table_gazebo.launch.py`.
+2. Verified that MoveIt planning and Plan and Execute successfully move the robot in both RViz and Gazebo.
+3. Integrated a Servo node into the Gazebo MoveIt launch configuration.
+4. Configured Servo for the UF850 planning group and the `/uf850_traj_controller/joint_trajectory` output topic.
+5. Verified that Servo starts and subscribes to:
+   - `/servo_server/delta_twist_cmds`
+   - `/joint_states`
+   - `/planning_scene`
+6. Created `/tmp/test_servo.py` to publish timestamped Cartesian Twist commands after Gazebo simulation time starts advancing.
+7. Verified that Twist messages reach Servo and that Servo reports no warnings.
+
+### Current Status
+
+**MoveIt planning works, but Cartesian Servo motion is not yet working.**
+
+The test Twist commands reach Servo, and Servo is connected to the robot-state and planning-scene topics. However, no joint trajectory is observed on `/uf850_traj_controller/joint_trajectory`, and the robot does not move.
+
+One unresolved issue is that some frame parameters appear in the generated ROS launch parameter files but were not visible in runtime parameter queries. This needs further investigation.
+
+### Files Modified
+
+In `~/xarm_ws/src/xarm_ros2`:
+
+- `xarm_gazebo/launch/uf850_beside_table_gazebo.launch.py`
+- `xarm_moveit_config/launch/_robot_moveit_gazebo.launch.py`
+- `xarm_moveit_servo/launch/uf850_moveit_servo_gazebo.launch.py` (new)
+
+These changes are local and have not been committed to the upstream xArm repository.
+
+The test publisher was saved from `/tmp/test_servo.py` to `~/xarm_ws/test_scripts/test_servo.py`.
+
+### Next Steps
+
+Investigate why Servo receives Cartesian commands and has access to the robot state and planning scene, but does not generate joint trajectories. Pay particular attention to its runtime frame configuration and command-processing path.
+
+Once Servo produces motion in Gazebo, test Cartesian translation and rotation commands and compare the behavior with the real UF850 Mode 5 interface.
