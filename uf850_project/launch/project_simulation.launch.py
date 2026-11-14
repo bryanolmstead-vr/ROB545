@@ -49,8 +49,8 @@ def generate_launch_description():
             '--world', 'default',
             '--file', block_sdf,
             '--name', 'block',
-            '--x', '0.5',
-            '--y', '0.0',
+            '--x', '0.40',
+            '--y', '-0.15',
             '--z', '1.0'
         ]
     )

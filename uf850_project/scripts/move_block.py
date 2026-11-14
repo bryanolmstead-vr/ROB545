@@ -7,14 +7,15 @@ import time
 MODEL_NAME = "block"
 SERVICE = "/world/default/set_pose"
 
-# Trajectory parameters (meters and seconds)
-CENTER_X = 0.55
-AMPLITUDE = 0.05
-Y = 0.0
+# Circular trajectory parameters
+CENTER_X = 0.30
+CENTER_Y = -0.15
+RADIUS = 0.10
 Z = 1.0
+
 PERIOD = 8.0
 DURATION = 24.0
-UPDATE_INTERVAL = 0.2
+UPDATE_INTERVAL = 0.05
 
 start_time = time.monotonic()
 
@@ -22,14 +23,15 @@ try:
     while time.monotonic() - start_time < DURATION:
         t = time.monotonic() - start_time
 
-        # Smooth back-and-forth movement
-        x = CENTER_X - AMPLITUDE * math.cos(
-            2 * math.pi * t / PERIOD
-        )
+        angle = 2 * math.pi * t / PERIOD
+
+        # Circular movement in the XY plane
+        x = CENTER_X + RADIUS * math.cos(angle)
+        y = CENTER_Y + RADIUS * math.sin(angle)
 
         request = (
             f'name: "{MODEL_NAME}", '
-            f'position: {{x: {x:.4f}, y: {Y}, z: {Z}}}, '
+            f'position: {{x: {x:.4f}, y: {y:.4f}, z: {Z}}}, '
             'orientation: {w: 1.0}'
         )
 
@@ -51,10 +53,10 @@ try:
             print(result.stdout, result.stderr)
             break
 
-        print(f"Time: {t:.2f} s | X: {x:.4f} m")
+        print(f"Time: {t:.2f} s | X: {x:.4f} m | Y: {y:.4f} m")
         time.sleep(UPDATE_INTERVAL)
 
 except KeyboardInterrupt:
     print("Movement stopped by user.")
 
-print("Trajectory script finished.")
+print("Circular trajectory finished.")
