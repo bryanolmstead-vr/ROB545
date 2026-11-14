@@ -217,3 +217,19 @@ The test publisher was saved from `/tmp/test_servo.py` to `~/xarm_ws/test_script
 Investigate why Servo receives Cartesian commands and has access to the robot state and planning scene, but does not generate joint trajectories. Pay particular attention to its runtime frame configuration and command-processing path.
 
 Once Servo produces motion in Gazebo, test Cartesian translation and rotation commands and compare the behavior with the real UF850 Mode 5 interface.
+
+**11/14/2026**
+
+Working through the following todo list. Will check off as they get completed.
+
+- [ ]	Create the correct directory structure for implementing custom ROS code and launch files outside of the xarm repo.
+
+- [ ] Move custom work that I’ve done into this new spot and clean up my xarm repo (or re clone it) so that it is pristine.
+
+- [ ] Continue working with Codex to get xarm_moveit_servo to work which takes a twist (velocity) command to move the gazebo robot.
+
+- [ ]	Create a simple Python test program where I can specify a joint target and it commands twists and reads current joint position to move to that target.
+
+- [ ]	Assume the joint target qt = (theta1, theta2, …, theta6) the 6 joints of the robot. Assume current values of the joints are q. Assume we command the robot using a twist qdot = (d/dt theta1, d/dt theta2, …, d/dt theta3) with xarm_moveit_servo. A simple control algorithm is qdot = K (qt – q).
+
+- [ ] Merge Nabin's code into mine and do a PR to main
