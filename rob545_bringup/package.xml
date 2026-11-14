@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>rob545_bringup</name>
+  <version>0.0.1</version>
+  <description>ROB545 visual servoing launch files.</description>
+  <maintainer email="bryanolmstead-vr@users.noreply.github.com">Bryan</maintainer>
+  <license>LicenseRef-Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>uf_ros_lib</exec_depend>
+  <exec_depend>xarm_gazebo</exec_depend>
+  <exec_depend>xarm_moveit_config</exec_depend>
+  <exec_depend>xarm_moveit_servo</exec_depend>
+  <exec_depend>xarm_controller</exec_depend>
+  <exec_depend>moveit_servo</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
