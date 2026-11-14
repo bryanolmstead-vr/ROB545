@@ -102,3 +102,20 @@ I'm not sure the `uf850_traj_contrller/follow_joint_trajectory` is exactly what 
 
 <video src="images/UF850-90deg.mp4" controls width="640" height="360"></video>
 
+**11/13/2026**
+
+I've been working for several days to understand ROS related to robot drivers. Beyond the ROB-545 class, I want to have a unified way of talking to robots in ROS to implement various use cases, including visual servoing.
+
+I spent quite a while looking at the Universal Robots ROS driver, which is the most complete in the industry. Then I looked at the UF850 real robot ROS driver and the UF850 Gazebo ROS driver. They provided different topics. Then I realized that Universal Robots has a single driver but UFactory has several pieces of their ROS driver that can be separately enabled. So I think for the real and simulated robot I had different pieces enabled. I will investigate further. 
+
+Furthermore, PBVS is a feedback loop that takes measured position of the target compared to desired position and uses this error to drive a velocity vector output to the robot. So the control to the robot is velocity not position. When the robot achieves the target location, the velocity becomes zero. This implies that a velocity controller is required, not a position controller. UF850 mode 7 is redirectable position control. Mode 5 might be redirectable velocity control. I will investigate further.
+
+For use in a deployed real robot, it is preferred to have trajectory generation occur on-robot instead of streaming a trajectory over the network. However, it appears that the general ROS robot drivers use streaming trajectories and indicate the requirement for real-time OS kernels. 
+
+**PBVS Algorithm**
+
+In reading Corke *Visual Control of Robots* section 6.4 *Visual Feedback Control* the act of visual servoing could be implemented in two ways. First, a redirectable position trajectory generator could be used (similar to UFactory mode 7), but this is described as potentially needlessly complicated. Instead the problem can be reframed as a control problem. The perceived position error generates a velocity demand which moves the robot toward the target. He says "This results automatically in target following behaviour, but without the complexities of an explicit trajectory generator." This is basically *steering*.
+
+Section 7.1 formulates the control equations for visual servoing. Position error is treated as a velocity and is integrated to yield position. For a still object (step function movement), tracking error becomes zero. For a constant speed object (ramp movement), there is a steady tracking error (lag). The end of section 7.1 describes feedforward as a viable solution to this problem.
+
+Section 7.5 discusses feedforward control, which is what we desire for our project, shown in Figure 7.20 or perhaps instead Figure 7.21.
