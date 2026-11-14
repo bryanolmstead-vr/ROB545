@@ -1,0 +1,7 @@
+
+# Generated ROS workspace files
+build/
+install/
+log/
+__pycache__/
+*.pyc
