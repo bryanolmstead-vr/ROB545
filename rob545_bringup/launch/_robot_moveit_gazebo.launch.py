@@ -10,7 +10,8 @@ import os
 import yaml
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import OpaqueFunction, IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions import OpaqueFunction, IncludeLaunchDescription, DeclareLaunchArgument, TimerAction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
@@ -35,6 +36,7 @@ def launch_setup(context, *args, **kwargs):
     mesh_suffix = LaunchConfiguration('mesh_suffix', default='stl')
     kinematics_suffix = LaunchConfiguration('kinematics_suffix', default='')
     gripper_version = LaunchConfiguration('gripper_version', default='G1')
+    start_at_ready_pose = LaunchConfiguration('start_at_ready_pose', default='true')
     
     add_gripper = LaunchConfiguration('add_gripper', default=False)
     add_vacuum_gripper = LaunchConfiguration('add_vacuum_gripper', default=False)
@@ -151,6 +153,14 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    startup_pose_node = Node(
+        package='rob545_bringup',
+        executable='move_to_start_pose.py',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(start_at_ready_pose),
+    )
+
     # robot moveit common launch
     # xarm_moveit_config/launch/_robot_moveit_common2.launch.py
     robot_moveit_common_launch = IncludeLaunchDescription(
@@ -187,10 +197,16 @@ def launch_setup(context, *args, **kwargs):
         robot_gazebo_launch,
         robot_moveit_common_launch,
         servo_node,
+        TimerAction(period=10.0, actions=[startup_pose_node]),
     ]
 
 
 def generate_launch_description():
     return LaunchDescription([
+        DeclareLaunchArgument(
+            'start_at_ready_pose',
+            default_value='true',
+            description='Move the UF850 to the ROB545 visual-servo ready pose at startup',
+        ),
         OpaqueFunction(function=launch_setup)
     ])

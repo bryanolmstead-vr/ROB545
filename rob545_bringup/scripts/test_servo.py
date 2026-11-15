@@ -8,7 +8,6 @@ from rclpy.node import Node
 from rclpy.parameter import Parameter
 from geometry_msgs.msg import TwistStamped
 from moveit_msgs.srv import ServoCommandType
-from std_srvs.srv import Trigger
 
 
 class ServoTest(Node):
@@ -22,10 +21,6 @@ class ServoTest(Node):
             TwistStamped,
             '/servo_server/delta_twist_cmds',
             10,
-        )
-        self.start_servo_client = self.create_client(
-            Trigger,
-            '/servo_server/start_servo',
         )
         self.switch_command_type_client = self.create_client(
             ServoCommandType,
@@ -47,14 +42,6 @@ class ServoTest(Node):
             raise RuntimeError(f'{service_name} failed: {message}')
         return response
 
-    def start_servo(self):
-        self._call_service(
-            self.start_servo_client,
-            Trigger.Request(),
-            '/servo_server/start_servo',
-        )
-        print('Servo started.')
-
     def set_twist_command_type(self):
         request = ServoCommandType.Request()
         request.command_type = ServoCommandType.Request.TWIST
@@ -65,12 +52,19 @@ class ServoTest(Node):
         )
         print('Servo switched to Twist command type.')
 
-    def publish_twist(self, vx):
+    def publish_twist(self, vy):
         msg = TwistStamped()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = 'link_base'
-        msg.twist.linear.x = vx
+        msg.twist.linear.y = vy
         self.pub.publish(msg)
+
+    def publish_for_duration(self, vy, duration):
+        start = time.monotonic()
+        while time.monotonic() - start < duration:
+            rclpy.spin_once(self, timeout_sec=0.0)
+            self.publish_twist(vy)
+            time.sleep(0.05)
 
 
 def main():
@@ -86,25 +80,24 @@ def main():
         sim_time = node.get_clock().now().nanoseconds / 1e9
         print(f'Simulation clock ready: {sim_time:.3f} seconds')
 
-        node.start_servo()
         node.set_twist_command_type()
 
         # Give ROS discovery time to connect the publisher and Servo subscriber.
         time.sleep(1.0)
 
-        print('Jogging +X at 10 mm/s for 1 second...')
-        start = time.monotonic()
+        jog_speed = 0.100  # 100 mm/s
+        jog_duration = 4.0  # seconds
+        print(f'Jogging +Y at {jog_speed*1000} mm/s for {jog_duration} seconds...')
+        node.publish_for_duration(jog_speed, jog_duration)
 
-        while time.monotonic() - start < 1.0:
-            rclpy.spin_once(node, timeout_sec=0.0)
-            node.publish_twist(0.01)
-            time.sleep(0.05)
+        print('Pausing at zero velocity...')
+        node.publish_for_duration(0.0, 0.5)
+
+        print(f'Returning -Y at {jog_speed*1000} mm/s for {jog_duration} seconds...')
+        node.publish_for_duration(-jog_speed, jog_duration)
 
         print('Stopping...')
-        for _ in range(10):
-            rclpy.spin_once(node, timeout_sec=0.0)
-            node.publish_twist(0.0)
-            time.sleep(0.05)
+        node.publish_for_duration(0.0, 0.5)
 
         print('Test complete.')
 

@@ -7,7 +7,9 @@ install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
-install(PROGRAMS scripts/test_servo.py
+install(PROGRAMS
+  scripts/test_servo.py
+  scripts/move_to_start_pose.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

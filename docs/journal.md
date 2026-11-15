@@ -228,10 +228,26 @@ Working through the following todo list. Will check off as they get completed.
 
 - [x] Continue working with Codex to get xarm_moveit_servo to work which takes a twist (velocity) command to move the gazebo robot.
 
-- [ ] Codex believes that the test program doesn't do `/servo_server/start_servo` and should also include seting to twist mode in the program instead of manually.
+- [x] Fix test_servo.py test program that moves using twist commands.
+
+- [x] Start robot above the table, away from singularities.
 
 - [ ]	Create a simple Python test program where I can specify a joint target and it commands twists and reads current joint position to move to that target.
 
 - [ ]	Assume the joint target qt = (theta1, theta2, …, theta6) the 6 joints of the robot. Assume current values of the joints are q. Assume we command the robot using a twist qdot = (d/dt theta1, d/dt theta2, …, d/dt theta3) with xarm_moveit_servo. A simple control algorithm is qdot = K (qt – q).
 
 - [ ] Merge Nabin's code into mine and do a PR to main
+
+**Running the Simulation**
+Start simulation:
+```
+cd ~/xarm_ws
+source install/setup.bash
+ros2 launch rob545_bringup uf850_moveit_gazebo.launch.py
+```
+Start test program with:
+```
+cd ~/xarm_ws
+source install/setup.bash
+python3 src/ROB545/rob545_bringup/scripts/test_servo.py
+```
