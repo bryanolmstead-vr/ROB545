@@ -16,6 +16,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     hw_ns = LaunchConfiguration('hw_ns', default='ufactory')
     start_at_ready_pose = LaunchConfiguration('start_at_ready_pose', default='true')
+    attach_rpy = LaunchConfiguration('attach_rpy', default='"0 0 3.14159265"')
     
     # robot moveit gazebo launch
     # xarm_moveit_config/launch/_robot_moveit_gazebo.launch.py
@@ -28,6 +29,7 @@ def generate_launch_description():
             'no_gui_ctrl': 'false',
             'gz_type': 'gz',
             'start_at_ready_pose': start_at_ready_pose,
+            'attach_rpy': attach_rpy,
         }.items(),
     )
     
@@ -36,6 +38,11 @@ def generate_launch_description():
             'start_at_ready_pose',
             default_value='true',
             description='Move the UF850 to the ROB545 visual-servo ready pose at startup',
+        ),
+        DeclareLaunchArgument(
+            'attach_rpy',
+            default_value='"0 0 3.14159265"',
+            description='Fixed world-to-link_base roll, pitch, and yaw in radians',
         ),
         robot_moveit_gazebo_launch
     ])

@@ -32,7 +32,7 @@ def launch_setup(context, *args, **kwargs):
     robot_sn = LaunchConfiguration('robot_sn', default='')
     attach_to = LaunchConfiguration('attach_to', default='world')
     attach_xyz = LaunchConfiguration('attach_xyz', default='"0 0 0"')
-    attach_rpy = LaunchConfiguration('attach_rpy', default='"0 0 0"')
+    attach_rpy = LaunchConfiguration('attach_rpy', default='"0 0 3.14159265"')
     mesh_suffix = LaunchConfiguration('mesh_suffix', default='stl')
     kinematics_suffix = LaunchConfiguration('kinematics_suffix', default='')
     gripper_version = LaunchConfiguration('gripper_version', default='G1')

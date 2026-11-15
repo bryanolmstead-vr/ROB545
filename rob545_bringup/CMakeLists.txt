@@ -10,6 +10,7 @@ install(DIRECTORY launch
 install(PROGRAMS
   scripts/test_servo.py
   scripts/move_to_start_pose.py
+  scripts/cartesian_point_servo.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
