@@ -14,13 +14,12 @@ RADIUS = 0.10
 Z = 1.0
 
 PERIOD = 8.0
-DURATION = 24.0
 UPDATE_INTERVAL = 0.05
 
 start_time = time.monotonic()
 
 try:
-    while time.monotonic() - start_time < DURATION:
+    while True:
         t = time.monotonic() - start_time
 
         angle = 2 * math.pi * t / PERIOD
@@ -51,7 +50,7 @@ try:
         if result.returncode != 0 or "data: true" not in result.stdout:
             print("Gazebo pose update failed.")
             print(result.stdout, result.stderr)
-            break
+            continue
 
         print(f"Time: {t:.2f} s | X: {x:.4f} m | Y: {y:.4f} m")
         time.sleep(UPDATE_INTERVAL)
