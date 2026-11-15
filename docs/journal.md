@@ -222,11 +222,13 @@ Once Servo produces motion in Gazebo, test Cartesian translation and rotation co
 
 Working through the following todo list. Will check off as they get completed.
 
-- [ ]	Create the correct directory structure for implementing custom ROS code and launch files outside of the xarm repo.
+- [x]	Create the correct directory structure for implementing custom ROS code and launch files outside of the xarm repo.
 
-- [ ] Move custom work that I’ve done into this new spot and clean up my xarm repo (or re clone it) so that it is pristine.
+- [x] Move custom work that I’ve done into this new spot and clean up my xarm repo (or re clone it) so that it is pristine.
 
-- [ ] Continue working with Codex to get xarm_moveit_servo to work which takes a twist (velocity) command to move the gazebo robot.
+- [x] Continue working with Codex to get xarm_moveit_servo to work which takes a twist (velocity) command to move the gazebo robot.
+
+- [ ] Codex believes that the test program doesn't do `/servo_server/start_servo` and should also include seting to twist mode in the program instead of manually.
 
 - [ ]	Create a simple Python test program where I can specify a joint target and it commands twists and reads current joint position to move to that target.
 

@@ -7,6 +7,8 @@ import rclpy
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 from geometry_msgs.msg import TwistStamped
+from moveit_msgs.srv import ServoCommandType
+from std_srvs.srv import Trigger
 
 
 class ServoTest(Node):
@@ -21,6 +23,47 @@ class ServoTest(Node):
             '/servo_server/delta_twist_cmds',
             10,
         )
+        self.start_servo_client = self.create_client(
+            Trigger,
+            '/servo_server/start_servo',
+        )
+        self.switch_command_type_client = self.create_client(
+            ServoCommandType,
+            '/servo_server/switch_command_type',
+        )
+
+    def _call_service(self, client, request, service_name):
+        if not client.wait_for_service(timeout_sec=5.0):
+            raise RuntimeError(f'Service {service_name} was not available')
+
+        future = client.call_async(request)
+        rclpy.spin_until_future_complete(self, future, timeout_sec=5.0)
+        if not future.done():
+            raise TimeoutError(f'Service call to {service_name} timed out')
+
+        response = future.result()
+        if response is None or not response.success:
+            message = getattr(response, 'message', 'no response')
+            raise RuntimeError(f'{service_name} failed: {message}')
+        return response
+
+    def start_servo(self):
+        self._call_service(
+            self.start_servo_client,
+            Trigger.Request(),
+            '/servo_server/start_servo',
+        )
+        print('Servo started.')
+
+    def set_twist_command_type(self):
+        request = ServoCommandType.Request()
+        request.command_type = ServoCommandType.Request.TWIST
+        self._call_service(
+            self.switch_command_type_client,
+            request,
+            '/servo_server/switch_command_type',
+        )
+        print('Servo switched to Twist command type.')
 
     def publish_twist(self, vx):
         msg = TwistStamped()
@@ -42,6 +85,9 @@ def main():
 
         sim_time = node.get_clock().now().nanoseconds / 1e9
         print(f'Simulation clock ready: {sim_time:.3f} seconds')
+
+        node.start_servo()
+        node.set_twist_command_type()
 
         # Give ROS discovery time to connect the publisher and Servo subscriber.
         time.sleep(1.0)
