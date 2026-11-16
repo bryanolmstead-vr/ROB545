@@ -53,3 +53,53 @@ The Python script currently uses repeated gz service calls through subprocesses 
 I confirmed that the ROS 2 ros_gz_interfaces/srv/SetEntityPose interface is installed. The next step is to test communication through ros_gz_bridge and implement a ROS 2 Python node for more efficient trajectory updates.
 
 This work addresses the initial moving-object simulation problem. Camera integration, PBVS, and UF850 tracking control have not yet been implemented.
+
+## November 14–15, 2026 — MoveIt Servo and Moving Block Integration
+
+**Objective:** Integrate my moving-block simulation and PBVS feedback monitor with Bryan's MoveIt Servo implementation to prepare for continuous visual tracking using the UF850.
+
+### 1. GitHub and Workspace Integration
+
+- Committed and pushed the updated `move_block.py` and `pbvs_feedback_monitor.py` to my branch (`bf0c185`).
+- Removed the 24-second movement limit and updated the script to continue after failed Gazebo pose requests.
+- Merged Bryan's latest `main` branch into `nabin-uf850-gazebo` (`ba2c5a7`).
+- Configured symbolic links so both `uf850_project` and `rob545_bringup` build directly from the Git repository.
+- Encountered a build error caused by outdated files referencing `move_block_backup.py`. Fixed it by cleaning the old package build directory and rebuilding both packages successfully.
+
+### 2. Testing MoveIt Servo
+
+Launched Bryan's integrated UF850 simulation using:
+
+```bash
+ros2 launch rob545_bringup uf850_moveit_gazebo.launch.py
+```
+
+- Verified that both ROS 2 controllers were active and end-effector TF was available.
+- Encountered duplicate ROS nodes because my previous simulation and MoveIt IK processes were still running. Resolved this by stopping the old processes and restarting the integrated simulation.
+- Tested Bryan's Cartesian Servo controller with a nearby target position of `(0.480, -0.040, 0.240)` m.
+- Successfully reduced the position error from **0.043 m to within 0.010 m**, confirming that MoveIt Servo could control the UF850 through Cartesian velocity commands.
+
+### 3. Moving Block on Bryan's Table
+
+- Kept Bryan's robot configuration, which positions the end effector above the table.
+- Inspected the Gazebo table model and determined the tabletop surface height (1.015 m).
+- Spawned my 5 cm block on the tabletop at `(0.30, -0.80, 1.040)` m.
+- Updated the circular trajectory to a **0.04 m radius and 16-second period**.
+- Successfully demonstrated continuous circular block motion in Bryan's Gazebo environment.
+
+### 4. PBVS Feedback Monitor
+
+- Fixed a Python indentation error in `pbvs_feedback_monitor.py`.
+- Successfully received the block and robot poses from Gazebo and the end-effector pose from TF.
+- Calculated position errors and proportional Cartesian velocity previews without commanding the robot.
+- Observed an unexpectedly large tracking error of approximately **0.87–0.92 m**, suggesting a possible mismatch between Gazebo world coordinates and the robot's `link_base` frame.
+
+### 5. Next Steps
+
+1. Verify the coordinate transformation between Gazebo world and `link_base`.
+2. Connect the moving block's position feedback to Bryan's MoveIt Servo controller.
+3. Demonstrate continuous moving-block tracking using proportional feedback.
+4. Add an RGB-D camera for actual visual-servoing measurements.
+5. Implement feedforward control and evaluate tracking error.
+
+**Current status:** Both the moving-block simulation and MoveIt Servo controller work independently within the same Gazebo environment. The next priority is correcting the coordinate transformation and integrating them into a single closed-loop tracking system.
